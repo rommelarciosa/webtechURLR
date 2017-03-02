@@ -1,0 +1,130 @@
+sudo apt-get update
+
+sudo apt-get install apache2
+
+---- Enabling mod_rewrite
+
+sudo a2enmod rewrite
+
+sudo service apache2 restart
+
+---In this section, we will setup a .htaccess file for simpler rewrite rule management.
+First, allow changes in the .htaccess file. Open the default Apache configuration file
+using nano or your favorite text editor.
+
+
+sudo nano /etc/apache2/sites-enabled/000-default.conf
+
+
+---Inside that file, you will find the <VirtualHost *:80> block on line 1. Inside of that block, 
+add the following block:
+
+/etc/apache2/sites-available/default
+
+<Directory /var/www/html>
+                Options Indexes FollowSymLinks MultiViews
+                AllowOverride All
+                Order allow,deny
+                allow from all
+</Directory>
+
+
+-----Your file should now match the following. Make sure that all blocks are properly indented.
+
+/etc/apache2/sites-available/default
+
+<VirtualHost *:80>
+    <Directory /var/www/html>
+        . . .
+    </Directory>
+    . . .
+</VirtualHost>
+
+
+-----To put these changes into effect, restart Apache.
+
+sudo service apache2 restart
+
+
+
+
+-----Now, create the .htaccess file.
+
+sudo nano /var/www/html/.htaccess
+
+
+
+-----Add this first line at the top of the new file to activate the RewriteEngine.
+
+/var/www/html/.htaccess
+RewriteEngine on
+
+
+----Save and exit the file.
+
+
+
+-----To ensure that other users may only read your .htaccess, run the following command to update permissions.
+
+sudo chmod 644 /var/www/html/.htaccess
+
+---You now have an operational .htaccess file, to govern your web application's routing rules.
+
+----We will begin by creating a file named about.html.
+
+sudo nano /var/www/html/about.html
+
+
+var/www/html/about.html
+<html>
+    <head>
+        <title>About Us</title>
+    </head>
+    <body>
+        <h1>About Us</h1>
+    </body>
+
+
+----Open up the .htaccess file.
+
+sudo nano /var/www/html/.htaccess
+</html>
+
+
+----After the first line, add the following.
+
+/var/www/html/.htaccess
+RewriteRule ^about$ about.html [NC]
+
+
+-------------------------------------
+You can now access example.com/about in your browser!
+
+This is a good simple example that shows the general syntax that all Rewrite Rules follow.
+
+^about$ is the string that gets matched from the URL. That is, it's what the viewer types in her browser. Our example uses a few metacharacters.
+
+^ indicates the start of the URL, after example.com/ is stripped away.
+$ indicates the end of the URL
+about matches the string "about"
+about.html is the actual path that the user accesses; that is, Apache will still serve the about.html file.
+
+[NC] is a flag that ignores capitalization in the URL.
+
+With the rule shown above, the following URLs will point to about.html:
+
+example.com/about
+example.com/About
+example.com/about.html
+The following will not:
+
+example.com/about/
+example.com/contact
+----Your file should now be identical to the following.
+
+/var/www/html/.htaccess
+RewriteEngine on
+RewriteRule ^about$ about.html [NC]
+
+
+
